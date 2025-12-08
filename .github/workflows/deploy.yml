@@ -1,0 +1,74 @@
+name: CI/CD Pipeline
+
+# Триггеры: push в main/master и ручной запуск
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+# Права для деплоя на Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Один деплой в очереди
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
+jobs:
+  # ------------------------
+  # Lint
+  # ------------------------
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run lint
+
+  # ------------------------
+  # Test
+  # ------------------------
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm test
+
+  # ------------------------
+  # Build
+  # ------------------------
+  build:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run build
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  # ------------------------
+  # Deploy to GitHub Pages
+  # ------------------------
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
