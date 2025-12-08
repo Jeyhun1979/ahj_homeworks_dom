@@ -1,1 +1,2 @@
 # ahj_homeworks_dom
+[![CI/CD Pipeline](https://github.com/Jeyhun1979/ahj_homeworks_dom/actions/workflows/deploy.yml/badge.svg)](https://github.com/Jeyhun1979/ahj_homeworks_dom/actions/workflows/deploy.yml)
