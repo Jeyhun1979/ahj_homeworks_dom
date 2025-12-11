@@ -7,6 +7,7 @@ export default class Game {
     this.cells = [];
     this.goblin = null;
     this.currentIndex = null;
+    this.intervalId = null;
   }
 
   init() {
@@ -22,11 +23,11 @@ export default class Game {
     for (let i = 0; i < this.fieldSize * this.fieldSize; i++) {
       const cell = document.createElement('div');
       cell.classList.add('cell');
-      field.appendChild(cell);
+      field.append(cell);
       this.cells.push(cell);
     }
 
-    this.root.appendChild(field);
+    this.root.append(field);
   }
 
   spawnGoblin() {
@@ -37,26 +38,30 @@ export default class Game {
 
     const index = this.getRandomIndex(null);
     this.currentIndex = index;
-    this.cells[index].appendChild(this.goblin);
+    this.cells[index].append(this.goblin);
   }
 
-  startMoving() {
-    setInterval(() => {
-      const newIndex = this.getRandomIndex(this.currentIndex);
-
-      this.cells[newIndex].appendChild(this.goblin);
-
-      this.currentIndex = newIndex;
-    }, 1000);
+  generateRandomIndex() {
+    return Math.floor(Math.random() * (this.fieldSize * this.fieldSize));
   }
 
   getRandomIndex(prevIndex) {
     let index;
-
     do {
-      index = Math.floor(Math.random() * (this.fieldSize * this.fieldSize));
+      index = this.generateRandomIndex();
     } while (index === prevIndex);
-
     return index;
+  }
+
+  startMoving() {
+    this.intervalId = setInterval(() => {
+      const newIndex = this.getRandomIndex(this.currentIndex);
+      this.cells[newIndex].append(this.goblin);
+      this.currentIndex = newIndex;
+    }, 1000);
+  }
+
+  stop() {
+    clearInterval(this.intervalId);
   }
 }
